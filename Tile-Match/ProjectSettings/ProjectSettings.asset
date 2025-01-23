@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 26
-  productGUID: 00000000000000000000000000000000
+  productGUID: 5ba7cbc6be4195b4c92aa67b37340b30
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -162,7 +162,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.Unity.Match3
-    Standalone: com.Unity.Match3
+    Standalone: com.DefaultCompany.Tile-Match
   buildNumber:
     Standalone: 0
     VisionOS: 0
