@@ -9,8 +9,12 @@ public class Board : MonoBehaviour
     public int borderSize;
     public GameObject tilePrefab;
     public GameObject[] gamePiecePrefabs;
+    public float  swapTime = 0.5f;
     Tile[,] allTiles;
     GamePiece[,] allGamePieces;
+
+    public Tile clickedTile;
+   public Tile targetTile;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,7 +55,7 @@ public class Board : MonoBehaviour
         }
         return gamePiecePrefabs[randomIdx];
     }
-    void PlaceGamePiece(GamePiece gamePiece,int x,int y)
+   public void PlaceGamePiece(GamePiece gamePiece,int x,int y)
     {
         if(gamePiece == null)
         {
@@ -60,7 +64,17 @@ public class Board : MonoBehaviour
         }
         gamePiece.transform.position = new Vector3(x,y,0);
         gamePiece.transform.rotation = Quaternion.identity;
+        if(IsWithinBounds(x,y))
+        {   //corresponding
+            allGamePieces[x,y] = gamePiece;
+        }
+        
+        
         gamePiece.SetCoord(x,y);
+    }
+    bool IsWithinBounds(int x,int y)
+    {
+        return(x>= 0 && x< width && y>=0 && y<height);
     }
     void FillRandom()
     {
@@ -71,9 +85,57 @@ public class Board : MonoBehaviour
                 GameObject randomPiece = Instantiate(GetRandomPiece(), Vector3.zero, Quaternion.identity) as GameObject;
                 if(randomPiece != null)
                 {
+                    randomPiece.GetComponent<GamePiece>().Init(this);
                     PlaceGamePiece(randomPiece.GetComponent<GamePiece>(),i,j);
+                    randomPiece.transform.parent=transform;
                 }
             }
         }
+    }
+    public void ClickTile(Tile tile)
+    {
+        //if
+        if(clickedTile == null)
+        {
+            clickedTile =tile;
+            Debug.Log("clickedTile:"+tile.name);
+        }
+    }
+    public void DragToTile(Tile tile)
+    {
+        if(clickedTile !=null && IsNextTo(tile,clickedTile))
+        {
+            targetTile = tile;
+        }
+    }
+    public void ReleaseTile()
+    {
+        if(clickedTile != null && targetTile != null)
+        {
+            SwitchTiles(clickedTile,targetTile);
+        }
+    }
+    void SwitchTiles(Tile clickedTile, Tile targetTile)
+    {
+        GamePiece clickedPiece= allGamePieces[clickedTile.xIndex,clickedTile.yIndex];
+        GamePiece targetPiece = allGamePieces[targetTile.xIndex,targetTile.yIndex];
+
+        clickedPiece.Move(targetTile.xIndex,targetTile.yIndex,swapTime);
+        targetPiece.Move(clickedTile.xIndex,clickedTile.yIndex,swapTime);
+        //add code to switch corresponding GamePieces
+        //clickedTile = null;
+        //targetTile=null;
+    }
+    bool IsNextTo(Tile start, Tile end)
+    {
+        if(Mathf.Abs(start.xIndex - end.xIndex) == 1 && start.yIndex == end.yIndex)
+        {
+            return true;
+        }
+        if(Mathf.Abs(start.yIndex -end.yIndex) == 1 && start.xIndex == end.xIndex)
+        {
+            return true;
+        }
+        return false;
     }
 }
