@@ -17,6 +17,19 @@ public class GamePiece : MonoBehaviour
         SmoothStep,
         SmootherStep
     };
+    public MatchValue matchValue;
+    public enum MatchValue
+    {
+        BabyBlue,
+        Pink,
+        Yellow,
+        Orange,
+        Purple,
+        Blue,
+        Green,
+        DarkPink
+
+    }
     // Start is called before the first frame update
     void Start()
     {

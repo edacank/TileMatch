@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class Board : MonoBehaviour
 {
@@ -23,6 +25,7 @@ public class Board : MonoBehaviour
         SetUpTiles();
         SetUpCamera();
         FillRandom();
+        HighlightMatches();
     }
 
     
@@ -137,5 +140,132 @@ public class Board : MonoBehaviour
             return true;
         }
         return false;
+    }
+    List<GamePiece> FindMatches(int startX,int startY, Vector2 searchDirection, int minLength = 3)
+    {
+        List<GamePiece> matches = new List<GamePiece>();
+        GamePiece startPiece =null;
+
+        if(IsWithinBounds(startX,startY))
+        {
+            startPiece = allGamePieces[startX,startY];
+        }
+        if(startPiece != null)
+        {
+            matches.Add(startPiece);
+        }
+        else
+        {
+            return null;
+        }
+        int nextX;
+        int nextY;
+        int maxValue =(width> height) ? width:height;
+        for(int i =1;i < maxValue -1; i++)
+        {
+            nextX = startX +(int) Mathf.Clamp(searchDirection.x,-1,1) * i;
+            nextY = startY + (int) Mathf.Clamp(searchDirection.y,-1,1)*i;
+
+            if(!IsWithinBounds(nextX,nextY))
+            {
+                break;
+            }
+            GamePiece nextPiece = allGamePieces[nextX,nextY];
+
+            if(nextPiece.matchValue == startPiece.matchValue && !matches.Contains(nextPiece)) 
+            {
+                matches.Add(nextPiece);
+            }
+            else
+            {
+                break;
+            }
+        }
+            if(matches.Count >= minLength)
+            {
+                return matches;
+            }
+            return null;
+        
+    }
+
+    List<GamePiece> FindVerticalMatches(int startX,int startY,int minLength = 3)
+    {
+        List<GamePiece> upwardMatches = FindMatches(startX,startY, new Vector2(0,1),2);
+        List<GamePiece> downwardMatches = FindMatches(startX,startY, new Vector2(0,-1),2);
+        
+        if(upwardMatches == null)
+        {
+            upwardMatches = new List<GamePiece>();
+        }
+        if(downwardMatches == null)
+        {
+            downwardMatches = new List<GamePiece>();
+        }
+        /*
+        foreach(GamePiece piece in downwardMatches)
+        {
+            if(!upwardMatches.Contains(piece))
+            {
+                upwardMatches.Add(piece);
+            }
+
+        }*/
+       // return (upwardMatches.Count >= minLength) ? upwardMatches : null;
+        var combinedMatches = upwardMatches.Union(downwardMatches).ToList();
+        return (combinedMatches.Count >= minLength) ? combinedMatches : null;
+    
+    
+    }
+    List<GamePiece> FindHorizontalMatches(int startX,int startY,int minLength = 3)
+    {
+        List<GamePiece> rightMatches = FindMatches(startX,startY, new Vector2(1,0),2);
+        List<GamePiece> leftMatches = FindMatches(startX,startY, new Vector2(-1,0),2);
+        
+        if(rightMatches == null)
+        {
+            rightMatches = new List<GamePiece>();
+        }
+        if(leftMatches == null)
+        {
+            leftMatches = new List<GamePiece>();
+        }
+        
+        var combinedMatches = rightMatches.Union(leftMatches).ToList();
+        return (combinedMatches.Count >= minLength) ? combinedMatches : null;
+    
+    
+    }
+
+    void HighlightMatches()
+    {
+        for(int i =0; i< width; i++)
+        {
+            for(int j=0; j< height; j++)
+            {
+                SpriteRenderer spriteRenderer = allTiles[i,j].GetComponent<SpriteRenderer>();
+                spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b,0);
+                List<GamePiece> horizMatches =FindHorizontalMatches(i,j,3);
+                List<GamePiece> vertMatches = FindVerticalMatches(i,j,3);
+                if(horizMatches == null)
+                {
+                    horizMatches = new List<GamePiece>();
+                }
+            
+                if(vertMatches == null)
+                {
+                    vertMatches = new List<GamePiece>();
+                }
+                var combinedMatches = horizMatches.Union(vertMatches).ToList();
+                if(combinedMatches.Count >0)
+                {
+                    foreach(GamePiece piece in combinedMatches)
+                    {
+                         spriteRenderer = allTiles[piece.xIndex,piece.yIndex].GetComponent<SpriteRenderer>();
+                spriteRenderer.color = piece.GetComponent<SpriteRenderer>().color;
+                    }
+                }
+            }
+        }
     }
 }
