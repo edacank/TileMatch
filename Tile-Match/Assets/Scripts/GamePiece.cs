@@ -90,7 +90,9 @@ public class GamePiece : MonoBehaviour
                 }
                 break;
             }
+            //track the total running time
             elapsedTime += Time.deltaTime;
+            //calculate the lerp value
             float t = Mathf.Clamp(elapsedTime/timeToMove,0f,1f);
 
             switch(interpolation)
@@ -111,9 +113,9 @@ public class GamePiece : MonoBehaviour
                     break;
             }
             
-           
+           //move the game piece
             transform.position = Vector3.Lerp(startPosition,destination,t);
-
+            //wait until nextframe
             yield return null;
         }
         isMoving =false;

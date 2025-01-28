@@ -89,6 +89,11 @@ public class Board : MonoBehaviour
             for(int j =0; j<height;j++)
             {
                GamePiece piece = FillRandomAt(i, j);
+               while(HasMatchOnFill(i,j))
+               {
+                    ClearPieceAt(i,j);
+                    piece=FillRandomAt(i,j);
+               }
             }
         }
     }
@@ -142,6 +147,8 @@ public class Board : MonoBehaviour
         {
             SwitchTiles(clickedTile,targetTile);
         }
+        clickedTile = null;
+        targetTile = null;
     }
     void SwitchTiles(Tile clickedTile, Tile targetTile)
     {
@@ -151,7 +158,7 @@ public class Board : MonoBehaviour
     {
         GamePiece clickedPiece= allGamePieces[clickedTile.xIndex,clickedTile.yIndex];
         GamePiece targetPiece = allGamePieces[targetTile.xIndex,targetTile.yIndex];
-    if(targetPiece != null && clickedPiece != null)
+    if(targetPiece !=null && clickedPiece !=null)
     {
         clickedPiece.Move(targetTile.xIndex,targetTile.yIndex,swapTime);
         targetPiece.Move(clickedTile.xIndex,clickedTile.yIndex,swapTime);
@@ -159,14 +166,16 @@ public class Board : MonoBehaviour
         yield return new WaitForSeconds(swapTime);
         List<GamePiece> clickedPieceMatches =FindMatchesAt(clickedTile.xIndex,clickedTile.yIndex);
         List<GamePiece> targetPieceMatches =FindMatchesAt(targetTile.xIndex,targetTile.yIndex);
-        if(targetPieceMatches.Count == 0 &&  clickedPieceMatches.Count == 1)
+        //if they do not match remove them to their first positions.
+        if(targetPieceMatches.Count == 0 &&  clickedPieceMatches.Count == 0)
         {
             clickedPiece.Move(clickedTile.xIndex,clickedTile.yIndex,swapTime);
-            targetPiece.Move(targetPiece.xIndex,targetPiece.yIndex,swapTime);
+            targetPiece.Move(targetTile.xIndex,targetTile.yIndex,swapTime);
         }
-        else
-        {
-            yield return new WaitForSeconds(swapTime);
+       // yield return new WaitForSeconds(swapTime);
+      else
+       {
+            //yield return new WaitForSeconds(swapTime);
             ClearPieceAt(clickedPieceMatches);
             ClearPieceAt(targetPieceMatches);
            // HighlightMatchesAt(clickedTile.xIndex,clickedTile.yIndex);
@@ -192,7 +201,9 @@ public class Board : MonoBehaviour
         return false;
     }
    
-   //general search method; specify a starting coordinate (startX,startY) and use a Vector2 fror direction
+   //general search method; specify a starting coordinate (startX,startY) and use a Vector2 for direction 
+   //i.e (1,0) -->right (-1,0) --> left (0,1) --> up (0,-1) --> down
+   //minLength is the min number to be considered a match
     List<GamePiece> FindMatches(int startX,int startY, Vector2 searchDirection, int minLength = 3)
     {
         List<GamePiece> matches = new List<GamePiece>();
@@ -212,7 +223,7 @@ public class Board : MonoBehaviour
         }
         int nextX;
         int nextY;
-        int maxValue =(width> height) ? width:height;
+        int maxValue =(width > height) ? width: height;
         for(int i=1; i < maxValue -1; i++)
         {
             nextX = startX +(int) Mathf.Clamp(searchDirection.x,-1,1) * i;
@@ -223,6 +234,7 @@ public class Board : MonoBehaviour
                 break;
             }
             GamePiece nextPiece = allGamePieces[nextX,nextY];
+            //???
             if(nextPiece == null)
             {
                 break;
@@ -346,7 +358,7 @@ public class Board : MonoBehaviour
         {
             vertMatches = new List<GamePiece>();
         }
-        //always returns a list
+        //always returns a list, return value is not nullable.
         var combinedMatches = horizMatches.Union(vertMatches).ToList();
         return combinedMatches;
     }
