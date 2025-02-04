@@ -443,13 +443,33 @@ MonoBehaviour:
   clickedTile: {fileID: 0}
   targetTile: {fileID: 0}
   startingTiles:
+  - tilePrefab: {fileID: 8177022158243710494, guid: 1b50e92f6ba7d154cbc8f6b1c93cdfae, type: 3}
+    x: 2
+    y: 2
+    z: 0
+  - tilePrefab: {fileID: 8177022158243710494, guid: 1b50e92f6ba7d154cbc8f6b1c93cdfae, type: 3}
+    x: 2
+    y: 3
+    z: 0
+  - tilePrefab: {fileID: 8177022158243710494, guid: 1b50e92f6ba7d154cbc8f6b1c93cdfae, type: 3}
+    x: 2
+    y: 4
+    z: 0
+  - tilePrefab: {fileID: 8177022158243710494, guid: 1b50e92f6ba7d154cbc8f6b1c93cdfae, type: 3}
+    x: 4
+    y: 4
+    z: 0
   - tilePrefab: {fileID: 850639379721777028, guid: 8bac4f57534344c498f36fb5c45aeb03, type: 3}
     x: 3
     y: 4
     z: 0
-  - tilePrefab: {fileID: 850639379721777028, guid: 8bac4f57534344c498f36fb5c45aeb03, type: 3}
-    x: 5
-    y: 5
+  - tilePrefab: {fileID: 8177022158243710494, guid: 1b50e92f6ba7d154cbc8f6b1c93cdfae, type: 3}
+    x: 2
+    y: 4
+    z: 0
+  - tilePrefab: {fileID: 7537648521998914759, guid: 45f69a6e6e678aa468119399b336d016, type: 3}
+    x: 1
+    y: 1
     z: 0
 --- !u!1 &1450836594
 GameObject:

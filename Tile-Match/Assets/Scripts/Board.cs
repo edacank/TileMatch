@@ -43,13 +43,15 @@ public class Board : MonoBehaviour
     
     void SetUpTiles()
     {
-        foreach(StartingTile sTile in startingTiles){
+        foreach(StartingTile sTile in startingTiles)
+        {
             if(sTile != null)
             {
                 MakeTile(sTile.tilePrefab, sTile.x, sTile.y, sTile.z);
             }
         }
-        for(int i =0; i < width; i++){
+        for(int i =0; i < width; i++)
+        {
             for(int j=0; j < height; j++)
             {
                 if(allTiles[i,j] == null)
@@ -114,9 +116,9 @@ public class Board : MonoBehaviour
     {
         int maxIterations =100;
         int iterations = 0;
-        for(int i=0; i<width;i++)
+        for(int i=0; i < width; i++)
         {
-            for(int j =0; j<height;j++)
+            for(int j = 0; j < height; j++)
             { 
                 if(allGamePieces[i,j] == null && allTiles[i,j].tileType != TileType.Obstacle)
                 {
@@ -365,7 +367,7 @@ public class Board : MonoBehaviour
     }
     List<GamePiece> FindAllMatches()
     {
-        List<GamePiece> combinedMatches = null;
+        List<GamePiece> combinedMatches = new List<GamePiece>();
         for(int i =0; i<width;i++)
         {
             for(int j = 0; j<height; j++)
@@ -378,8 +380,10 @@ public class Board : MonoBehaviour
     }
     void HighlightTileOff(int x,int y)
     {
-        SpriteRenderer spriteRenderer = allTiles[x, y].GetComponent<SpriteRenderer>();
-                spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
+        if(allTiles[x,y].tileType != TileType.Breakable){
+             SpriteRenderer spriteRenderer = allTiles[x, y].GetComponent<SpriteRenderer>();
+             spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
+    }
     }
     void HighlightTileOn(int x, int y , Color col)
     {
@@ -458,6 +462,26 @@ void ClearPieceAt(int x, int y)
     }
     HighlightTileOff(x,y);
 }
+void BreakTile(int x, int y)
+{
+    Tile tileToBreak = allTiles[x,y];
+    if(tileToBreak != null)
+    {
+        tileToBreak.BreakTile();
+    }
+
+}
+void BreakTileAt(List<GamePiece> gamePieces)
+{
+    foreach(GamePiece piece in gamePieces)
+    {
+        if(piece != null)
+        {
+            BreakTile(piece.xIndex, piece.yIndex);
+        }
+    }
+
+}
 void ClearBoard()
 {
     for(int i =0; i<width;i++)
@@ -486,7 +510,7 @@ List<GamePiece> CollapseColumn(int column, float collapseTime = 0.1f)
     List<GamePiece> movingPieces = new List<GamePiece>();
     for(int i=0; i < height -1; i++)
     {
-        if(allGamePieces[column,i] == null)
+        if(allGamePieces[column,i] == null && allTiles[column,i].tileType != TileType.Obstacle)
         {
             for(int j = i+1; j<height; j++ )
             {
@@ -568,6 +592,8 @@ IEnumerator ClearAndCollapseRoutine(List<GamePiece> gamePieces)
     while(!isFinished)
     {
         ClearPieceAt(gamePieces);
+        BreakTileAt(gamePieces);
+
         yield return new WaitForSeconds(0.25f);
         movingPieces = CollapseColumn(gamePieces);
         //
